@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NAnime - Anime & Manga Hub</title>
-  <meta name="description" content="Discover trending anime and manga. Save your favorites with one click. All links support official releases.">
+  <meta name="description" content="Trending anime, manga, and movies. Save your favorites with one click.">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -40,32 +40,43 @@
       border: none;
       color: #555;
       cursor: pointer;
-      font-size: 1.2rem;
+      font-size: 1.4rem;
       position: absolute;
       top: 0.5rem;
       right: 0.5rem;
     }
-    .bookmark-btn.active {
-      color: gold;
-    }
-    .media-item {
-      position: relative;
+    .bookmark-btn.active { color: gold; }
+    .media-item { position: relative; }
+    @media (min-width: 1024px) {
+      .main-content { max-width: 65%; }
+      .sidebar { width: 33%; }
     }
   </style>
 </head>
 <body class="bg-dark text-offwhite min-h-screen font-sans">
-  <div class="container mx-auto px-4 py-8 max-w-4xl">
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
     <!-- Header -->
     <header class="text-center mb-8">
       <h1 class="text-5xl font-bold tracking-tight">
         <span class="text-primary">N</span>Anime
       </h1>
-      <p class="text-lightgray mt-3 text-lg">Anime • Manga • News</p>
+      <p class="text-lightgray mt-3 text-lg">Anime • Manga • Movies</p>
     </header>
+
+    <!-- 💖 My List -->
+    <section class="mb-6">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-yellow-400 text-xl">★</span>
+        <h2 class="text-lg font-bold">My List</h2>
+      </div>
+      <div id="mylist-preview" class="flex flex-wrap gap-2 text-sm">
+        <span class="text-gray-500">Click ★ to save anime/manga.</span>
+      </div>
+    </section>
 
     <!-- 🔍 Search Bar -->
     <section class="mb-8">
-      <div class="relative max-w-xl mx-auto">
+      <div class="relative max-w-xl mx-auto lg:mx-0">
         <input 
           type="text" 
           id="search-input" 
@@ -76,72 +87,120 @@
       </div>
     </section>
 
-    <!-- 📺 Anime Section -->
-    <section class="mb-12">
-      <div class="flex items-center gap-2 mb-4">
-        <span class="text-primary text-xl">📺</span>
-        <h2 class="text-2xl font-bold">Trending Anime</h2>
-      </div>
-      <div id="anime-list" class="space-y-6">
-        <p class="text-gray-500">Loading anime...</p>
-      </div>
-    </section>
+    <!-- Main Content + Sidebar -->
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- Main Content -->
+      <div class="main-content space-y-12">
+        <!-- 📺 ANIME -->
+        <section>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-primary text-xl">📺</span>
+            <h2 class="text-2xl font-bold">Trending Anime</h2>
+          </div>
+          <div id="anime-list" class="space-y-6">
+            <p class="text-gray-500">Loading anime...</p>
+          </div>
+        </section>
 
-    <!-- 📖 Manga Section -->
-    <section class="mb-12">
-      <div class="flex items-center gap-2 mb-4">
-        <span class="text-primary text-xl">📖</span>
-        <h2 class="text-2xl font-bold">Trending Manga</h2>
-      </div>
-      <div id="manga-list" class="space-y-6">
-        <p class="text-gray-500">Loading manga...</p>
-      </div>
-    </section>
+        <!-- 📖 MANGA -->
+        <section>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-primary text-xl">📖</span>
+            <h2 class="text-2xl font-bold">Trending Manga</h2>
+          </div>
+          <div id="manga-list" class="space-y-6">
+            <p class="text-gray-500">Loading manga...</p>
+          </div>
+        </section>
 
-    <!-- 📰 Latest News -->
-    <section class="mb-12">
-      <div class="flex items-center gap-2 mb-4">
-        <span class="text-primary text-xl">📰</span>
-        <h2 class="text-2xl font-bold">Latest Anime News</h2>
-      </div>
-      <div id="rss-news" class="space-y-5">
-        <p class="text-gray-500">Loading latest updates...</p>
-      </div>
-      <p class="text-sm text-gray-600 mt-3">
-        Sources: 
-        <a href="https://www.crunchyroll.com" class="text-primary hover:underline" target="_blank">Crunchyroll</a> & 
-        <a href="https://www.animenewsnetwork.com" class="text-primary hover:underline" target="_blank">ANN</a>
-      </p>
-    </section>
+        <!-- 📰 News -->
+        <section>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-primary text-xl">📰</span>
+            <h2 class="text-2xl font-bold">Latest Anime News</h2>
+          </div>
+          <div id="rss-news" class="space-y-5">
+            <p class="text-gray-500">Loading latest updates...</p>
+          </div>
+          <p class="text-sm text-gray-600 mt-3">
+            Sources: 
+            <a href="https://www.crunchyroll.com" class="text-primary hover:underline" target="_blank">Crunchyroll</a> & 
+            <a href="https://www.animenewsnetwork.com" class="text-primary hover:underline" target="_blank">ANN</a>
+          </p>
+        </section>
 
-    <!-- 🤔 Recommendation Quiz -->
-    <section class="mb-12">
-      <div class="flex items-center gap-2 mb-4">
-        <span class="text-primary text-xl">🤔</span>
-        <h2 class="text-2xl font-bold">What Should You Watch?</h2>
+        <!-- 🤔 Quiz -->
+        <section>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-primary text-xl">🤔</span>
+            <h2 class="text-2xl font-bold">What Should You Watch?</h2>
+          </div>
+          <div class="bg-black/40 p-6 rounded-xl border border-gray-900">
+            <p class="mb-4">Pick your mood and genre!</p>
+            <select id="mood" class="bg-gray-900 text-white border border-gray-700 rounded px-3 py-2 mr-3 mb-3">
+              <option value="excited">I want action!</option>
+              <option value="chill">I want something relaxing</option>
+              <option value="deep">I want deep story</option>
+            </select>
+            <select id="genre" class="bg-gray-900 text-white border border-gray-700 rounded px-3 py-2 mb-3">
+              <option value="shonen">Shonen</option>
+              <option value="slice">Slice of Life</option>
+              <option value="mecha">Mecha</option>
+              <option value="romance">Romance</option>
+            </select>
+            <button onclick="getRecommendation()" class="bg-primary text-white px-4 py-2 rounded hover:bg-red-700 transition">
+              Get Recommendation
+            </button>
+            <div id="recommendation-result" class="mt-4 text-gray-300"></div>
+          </div>
+        </section>
       </div>
-      <div class="bg-black/40 p-6 rounded-xl border border-gray-900">
-        <p class="mb-4">Pick your mood and genre!</p>
-        <select id="mood" class="bg-gray-900 text-white border border-gray-700 rounded px-3 py-2 mr-3 mb-3">
-          <option value="excited">I want action!</option>
-          <option value="chill">I want something relaxing</option>
-          <option value="deep">I want deep story</option>
-        </select>
-        <select id="genre" class="bg-gray-900 text-white border border-gray-700 rounded px-3 py-2 mb-3">
-          <option value="shonen">Shonen</option>
-          <option value="slice">Slice of Life</option>
-          <option value="mecha">Mecha</option>
-          <option value="romance">Romance</option>
-        </select>
-        <button onclick="getRecommendation()" class="bg-primary text-white px-4 py-2 rounded hover:bg-red-700 transition">
-          Get Recommendation
-        </button>
-        <div id="recommendation-result" class="mt-4 text-gray-300"></div>
-      </div>
-    </section>
 
-    <!-- Call to Action -->
-    <section class="text-center py-8 bg-black/30 rounded-xl border border-gray-900">
+      <!-- 📌 SIDEBAR -->
+      <div class="sidebar space-y-8">
+        <!-- 🎬 Movies -->
+        <section>
+          <h3 class="text-xl font-bold mb-3 flex items-center gap-2">
+            <span class="text-primary">🎬</span> Trending Movies
+          </h3>
+          <div id="movies-list" class="space-y-3">
+            <p class="text-gray-500 text-sm">Loading movies...</p>
+          </div>
+        </section>
+
+        <!-- 🎭 Genres -->
+        <section>
+          <h3 class="text-xl font-bold mb-3 flex items-center gap-2">
+            <span class="text-primary">🎭</span> Genres
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            <span class="bg-gray-800 px-2 py-1 rounded text-xs cursor-pointer hover:bg-gray-700" onclick="filterByGenre('Action')">Action</span>
+            <span class="bg-gray-800 px-2 py-1 rounded text-xs cursor-pointer hover:bg-gray-700" onclick="filterByGenre('Romance')">Romance</span>
+            <span class="bg-gray-800 px-2 py-1 rounded text-xs cursor-pointer hover:bg-gray-700" onclick="filterByGenre('Shonen')">Shonen</span>
+            <span class="bg-gray-800 px-2 py-1 rounded text-xs cursor-pointer hover:bg-gray-700" onclick="filterByGenre('Slice of Life')">Slice of Life</span>
+            <span class="bg-gray-800 px-2 py-1 rounded text-xs cursor-pointer hover:bg-gray-700" onclick="filterByGenre('Mecha')">Mecha</span>
+            <span class="bg-gray-800 px-2 py-1 rounded text-xs cursor-pointer hover:bg-gray-700" onclick="filterByGenre('Fantasy')">Fantasy</span>
+          </div>
+        </section>
+
+        <!-- 🏷️ Tags -->
+        <section>
+          <h3 class="text-xl font-bold mb-3 flex items-center gap-2">
+            <span class="text-primary">🏷️</span> Popular Tags
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            <span class="bg-gray-800 px-2 py-1 rounded text-xs cursor-pointer hover:bg-gray-700" onclick="filterByTag('Isekai')">Isekai</span>
+            <span class="bg-gray-800 px-2 py-1 rounded text-xs cursor-pointer hover:bg-gray-700" onclick="filterByTag('Time Travel')">Time Travel</span>
+            <span class="bg-gray-800 px-2 py-1 rounded text-xs cursor-pointer hover:bg-gray-700" onclick="filterByTag('School')">School</span>
+            <span class="bg-gray-800 px-2 py-1 rounded text-xs cursor-pointer hover:bg-gray-700" onclick="filterByTag('Supernatural')">Supernatural</span>
+            <span class="bg-gray-800 px-2 py-1 rounded text-xs cursor-pointer hover:bg-gray-700" onclick="filterByTag('Comedy')">Comedy</span>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <section class="text-center py-8 mt-12 bg-black/30 rounded-xl border border-gray-900">
       <h3 class="text-xl font-semibold mb-3">Support Official Releases!</h3>
       <p class="text-gray-300 mb-4">We only link to legal streaming & publishing services.</p>
       <a href="https://www.crunchyroll.com" target="_blank"
@@ -153,13 +212,12 @@
     <!-- Footer -->
     <footer class="text-center text-gray-600 text-sm pt-10 mt-8 border-t border-gray-900">
       <p>© 2026 NAnime • 100% Legal Fan Hub</p>
-      <p class="mt-1">Not affiliated with any anime studio or distributor.</p>
     </footer>
   </div>
 
   <!-- Scripts -->
   <script>
-    // --- BOOKMARKING (localStorage) ---
+    // --- BOOKMARKING ---
     let bookmarks = JSON.parse(localStorage.getItem('nanimе-bookmarks') || '[]');
 
     function toggleBookmark(media) {
@@ -171,6 +229,28 @@
         bookmarks.push(media);
       }
       localStorage.setItem('nanimе-bookmarks', JSON.stringify(bookmarks));
+      renderMyListPreview();
+      updateBookmarkButtons();
+    }
+
+    function renderMyListPreview() {
+      const container = document.getElementById('mylist-preview');
+      if (bookmarks.length === 0) {
+        container.innerHTML = '<span class="text-gray-500">Click ★ to save anime/manga.</span>';
+        return;
+      }
+      container.innerHTML = bookmarks.map(item => `
+        <span class="bg-gray-800 px-2 py-1 rounded text-xs flex items-center gap-1">
+          <span>${item.title}</span>
+          <button onclick="removeFromList(${item.id})" class="text-red-400 hover:text-red-200">×</button>
+        </span>
+      `).join('');
+    }
+
+    function removeFromList(id) {
+      bookmarks = bookmarks.filter(b => b.id !== id);
+      localStorage.setItem('nanimе-bookmarks', JSON.stringify(bookmarks));
+      renderMyListPreview();
       updateBookmarkButtons();
     }
 
@@ -183,17 +263,16 @@
       });
     }
 
-    // --- LOAD ANIME (always show trending) ---
+    // --- LOAD ANIME ---
     async function loadAnime() {
       const query = `
         query {
-          Page(page: 1, perPage: 12) {
-            media(type: ANIME, sort: TRENDING_DESC, status_in: [RELEASING, FINISHED], format_in: [TV, MOVIE, OVA]) {
+          Page(page: 1, perPage: 10) {
+            media(type: ANIME, sort: TRENDING_DESC, status_in: [RELEASING, FINISHED]) {
               id
               title { romaji }
               coverImage { large }
               episodes
-              status
             }
           }
         }
@@ -205,24 +284,22 @@
           body: JSON.stringify({ query })
         });
         const data = await res.json();
-        const animeList = data.data.Page.media || [];
-        renderMediaList(animeList, 'anime');
+        renderAnime(data.data.Page.media || []);
       } catch (e) {
-        document.getElementById('anime-list').innerHTML = '<p class="text-red-400 text-center">Failed to load anime.</p>';
+        document.getElementById('anime-list').innerHTML = '<p class="text-red-400">Failed to load anime.</p>';
       }
     }
 
-    // --- LOAD MANGA (always show trending) ---
+    // --- LOAD MANGA ---
     async function loadManga() {
       const query = `
         query {
-          Page(page: 1, perPage: 12) {
+          Page(page: 1, perPage: 10) {
             media(type: MANGA, sort: TRENDING_DESC, status_in: [RELEASING, FINISHED]) {
               id
               title { romaji }
               coverImage { large }
               chapters
-              status
             }
           }
         }
@@ -234,68 +311,95 @@
           body: JSON.stringify({ query })
         });
         const data = await res.json();
-        const mangaList = data.data.Page.media || [];
-        renderMediaList(mangaList, 'manga');
+        renderManga(data.data.Page.media || []);
       } catch (e) {
-        document.getElementById('manga-list').innerHTML = '<p class="text-red-400 text-center">Failed to load manga.</p>';
+        document.getElementById('manga-list').innerHTML = '<p class="text-red-400">Failed to load manga.</p>';
       }
     }
 
-    // --- RENDER MEDIA LIST ---
-    function renderMediaList(items, type) {
-      const container = type === 'anime' ? document.getElementById('anime-list') : document.getElementById('manga-list');
-      
-      if (items.length === 0) {
-        container.innerHTML = `<p class="text-yellow-400 text-center">No ${type} found.</p>`;
-        return;
+    // --- LOAD MOVIES ---
+    async function loadMovies() {
+      const query = `
+        query {
+          Page(page: 1, perPage: 5) {
+            media(type: ANIME, format: MOVIE, sort: TRENDING_DESC, status_in: [RELEASING, FINISHED]) {
+              id
+              title { romaji }
+              coverImage { large }
+            }
+          }
+        }
+      `;
+      try {
+        const res = await fetch('https://graphql.anilist.co', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+        const data = await res.json();
+        const movies = data.data.Page.media || [];
+        document.getElementById('movies-list').innerHTML = movies.map(m => `
+          <div class="flex items-center gap-3 cursor-pointer hover:text-primary" onclick="alert('Viewing: ${m.title.romaji}')">
+            <img src="${m.coverImage.large}" alt="${m.title.romaji}" class="w-10 h-14 object-cover rounded">
+            <span class="text-sm">${m.title.romaji}</span>
+          </div>
+        `).join('');
+      } catch (e) {
+        document.getElementById('movies-list').innerHTML = '<p class="text-red-400 text-sm">Failed to load movies.</p>';
       }
+    }
 
+    // --- RENDER ANIME ---
+    function renderAnime(items) {
+      const container = document.getElementById('anime-list');
       container.innerHTML = items.map(item => {
-        const imageUrl = item.coverImage?.large || 'https://via.placeholder.com/80x112/333/666?text=?';
-        const label = type === 'anime' 
-          ? (item.episodes ? `${item.episodes} eps` : 'Ongoing') 
-          : (item.chapters ? `${item.chapters} chs` : 'Ongoing');
-        
+        const img = item.coverImage?.large || 'https://via.placeholder.com/80x112/333/666?text=?';
         return `
           <div class="bg-black/40 p-4 rounded-xl border border-gray-900 hover:border-primary transition flex items-start gap-4 media-item cursor-pointer">
-            <img src="${imageUrl}" alt="${item.title.romaji}" class="w-16 h-24 object-cover rounded-lg flex-shrink-0">
+            <img src="${img}" alt="${item.title.romaji}" class="w-16 h-24 object-cover rounded-lg">
             <div>
               <div class="font-bold text-lg">${item.title.romaji}</div>
-              <div class="text-gray-300 mt-1 text-sm">${label}</div>
+              <div class="text-gray-300 text-sm">${item.episodes ? item.episodes + ' eps' : 'Ongoing'}</div>
             </div>
-            <button class="bookmark-btn" data-id="${item.id}" onclick="toggleBookmarkLight(event, ${JSON.stringify(item)})">☆</button>
+            <button class="bookmark-btn" data-id="${item.id}" onclick="toggleBookmarkLight(event, ${JSON.stringify({...item, type: 'ANIME'})})">☆</button>
           </div>
         `;
       }).join('');
+      updateBookmarkButtons();
+    }
 
-      // Add click for details (optional)
-      document.querySelectorAll('.media-item').forEach(el => {
-        el.addEventListener('click', () => {
-          const title = el.querySelector('img').alt;
-          alert(`You clicked: ${title}\nClick ★ to bookmark!`);
-        });
-      });
-
+    // --- RENDER MANGA ---
+    function renderManga(items) {
+      const container = document.getElementById('manga-list');
+      container.innerHTML = items.map(item => {
+        const img = item.coverImage?.large || 'https://via.placeholder.com/80x112/333/666?text=?';
+        return `
+          <div class="bg-black/40 p-4 rounded-xl border border-gray-900 hover:border-primary transition flex items-start gap-4 media-item cursor-pointer">
+            <img src="${img}" alt="${item.title.romaji}" class="w-16 h-24 object-cover rounded-lg">
+            <div>
+              <div class="font-bold text-lg">${item.title.romaji}</div>
+              <div class="text-gray-300 text-sm">${item.chapters ? item.chapters + ' chs' : 'Ongoing'}</div>
+            </div>
+            <button class="bookmark-btn" data-id="${item.id}" onclick="toggleBookmarkLight(event, ${JSON.stringify({...item, type: 'MANGA'})})">☆</button>
+          </div>
+        `;
+      }).join('');
       updateBookmarkButtons();
     }
 
     function toggleBookmarkLight(event, media) {
       event.stopPropagation();
-      const enriched = {
+      toggleBookmark({
         id: media.id,
         title: media.title.romaji,
         coverImage: media.coverImage?.large || 'https://via.placeholder.com/80x112/333/666?text=?',
-        type: media.type || (media.format ? 'ANIME' : 'MANGA')
-      };
-      toggleBookmark(enriched);
+        type: media.type
+      });
     }
 
-    // --- NEWS FROM RSS ---
+    // --- NEWS ---
     async function loadRssNews() {
-      const feeds = [
-        'https://www.crunchyroll.com/newsrss',
-        'https://www.animenewsnetwork.com/news/feed.xml'
-      ];
+      const feeds = ['https://www.crunchyroll.com/newsrss','https://www.animenewsnetwork.com/news/feed.xml'];
       let allItems = [];
       for (const url of feeds) {
         try {
@@ -304,34 +408,17 @@
           const data = await response.json();
           if (data.status === 'ok') {
             const isCrunchyroll = url.includes('crunchyroll');
-            allItems.push(...data.items.map(item => ({
-              ...item,
-              source: isCrunchyroll ? 'Crunchyroll' : 'ANN'
-            })));
+            allItems.push(...data.items.map(item => ({...item, source: isCrunchyroll ? 'Crunchyroll' : 'ANN'})));
           }
-        } catch (err) {
-          console.warn('RSS feed failed:', url);
-        }
+        } catch (err) {}
       }
-
       allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-      const container = document.getElementById('rss-news');
-      if (allItems.length === 0) {
-        container.innerHTML = '<p class="text-yellow-400">News temporarily unavailable.</p>';
-        return;
-      }
-
-      container.innerHTML = allItems.slice(0, 4).map(item => `
+      document.getElementById('rss-news').innerHTML = allItems.slice(0, 4).map(item => `
         <div class="bg-black/40 p-5 rounded-xl border border-gray-900 news-item" data-content="${(item.title + ' ' + item.description).toLowerCase()}">
           <div class="text-xs text-primary font-bold mb-1">${item.source}</div>
           <h3 class="font-bold text-lg text-white leading-tight">${item.title}</h3>
-          <p class="text-gray-300 mt-2 text-sm">
-            ${item.description.replace(/<[^>]*>/g, '').substring(0, 180)}...
-          </p>
-          <a href="${item.link}" target="_blank" rel="noopener noreferrer"
-             class="inline-block mt-3 text-primary hover:text-red-400 text-sm font-medium">
-            Read full story →
-          </a>
+          <p class="text-gray-300 mt-2 text-sm">${item.description.replace(/<[^>]*>/g, '').substring(0, 180)}...</p>
+          <a href="${item.link}" target="_blank" class="inline-block mt-3 text-primary hover:text-red-400 text-sm font-medium">Read full story →</a>
         </div>
       `).join('');
     }
@@ -341,61 +428,42 @@
       const mood = document.getElementById('mood').value;
       const genre = document.getElementById('genre').value;
       let anime, reason, platform;
-
-      if (mood === 'excited' && genre === 'shonen') {
-        anime = "Demon Slayer";
-        reason = "Epic battles, stunning animation, and emotional depth.";
-        platform = "Crunchyroll";
-      } else if (mood === 'chill' && genre === 'slice') {
-        anime = "Laid-Back Camp";
-        reason = "Peaceful vibes, beautiful scenery, and cozy friendships.";
-        platform = "HIDIVE";
-      } else if (mood === 'deep' && genre === 'mecha') {
-        anime = "Neon Genesis Evangelion";
-        reason = "Psychological mecha classic that redefined anime.";
-        platform = "Netflix";
-      } else {
-        anime = "Jujutsu Kaisen";
-        reason = "Modern shonen hit with incredible animation and pacing.";
-        platform = "Crunchyroll";
-      }
-
+      if (mood === 'excited' && genre === 'shonen') { anime = "Demon Slayer"; reason = "Epic battles."; platform = "Crunchyroll"; }
+      else if (mood === 'chill' && genre === 'slice') { anime = "Laid-Back Camp"; reason = "Peaceful vibes."; platform = "HIDIVE"; }
+      else if (mood === 'deep' && genre === 'mecha') { anime = "Neon Genesis Evangelion"; reason = "Psychological classic."; platform = "Netflix"; }
+      else { anime = "Jujutsu Kaisen"; reason = "Modern shonen hit."; platform = "Crunchyroll"; }
       document.getElementById('recommendation-result').innerHTML = `
         <div class="p-3 bg-gray-900/50 rounded">
-          <strong class="text-primary">${anime}</strong><br>
-          ${reason}<br>
-          <a href="https://www.${platform.toLowerCase()}.com" target="_blank" class="text-primary hover:underline">
-            Watch on ${platform} →
-          </a>
+          <strong class="text-primary">${anime}</strong><br>${reason}<br>
+          <a href="https://www.${platform.toLowerCase()}.com" target="_blank" class="text-primary hover:underline">Watch on ${platform} →</a>
         </div>
       `;
     }
 
+    // --- FILTER FUNCTIONS (basic demo) ---
+    function filterByGenre(genre) {
+      alert(`Filtering by genre: ${genre}\n(In a full app, this would reload the list.)`);
+    }
+
+    function filterByTag(tag) {
+      alert(`Filtering by tag: ${tag}`);
+    }
+
     // --- SEARCH ---
     document.getElementById('search-input').addEventListener('input', (e) => {
-      const term = e.target.value.trim().toLowerCase();
-      if (!term) {
-        document.querySelectorAll('.media-item, .news-item').forEach(el => {
-          el.style.display = el.classList.contains('media-item') ? 'flex' : 'block';
-        });
-        return;
-      }
-
-      document.querySelectorAll('.media-item').forEach(el => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('.media-item, .news-item').forEach(el => {
         const text = el.textContent.toLowerCase();
-        el.style.display = text.includes(term) ? 'flex' : 'none';
-      });
-
-      document.querySelectorAll('.news-item').forEach(el => {
-        const text = el.textContent.toLowerCase();
-        el.style.display = text.includes(term) ? 'block' : 'none';
+        el.style.display = text.includes(term) ? (el.classList.contains('media-item') ? 'flex' : 'block') : 'none';
       });
     });
 
-    // --- INITIALIZE ---
+    // --- INIT ---
     document.addEventListener('DOMContentLoaded', () => {
+      renderMyListPreview();
       loadAnime();
       loadManga();
+      loadMovies();
       loadRssNews();
     });
   </script>
