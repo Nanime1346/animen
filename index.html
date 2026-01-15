@@ -1,37 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NAnime - News, Schedule & Recommendations</title>
+  <meta name="description" content="Daily anime news, release schedule, and recommendations. All links support official streaming.">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#ff0033',
+            dark: '#000000',
+            offwhite: '#f0f0f0',
+            lightgray: '#bbbbbb'
+          }
+        }
+      }
+    }
+  </script>
 
-    <!-- Add this where you want news to appear -->
-<div id="rss-news" class="space-y-5">
-  <p class="text-gray-500">Loading latest anime news...</p>
-</div>
+  <!-- Google Analytics (Replace G-XXXXXXXXXX with your ID) -->
+  <!--
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+  -->
 
-<script>
-async function loadRssNews() {
-  const feeds = [
-    'https://www.crunchyroll.com/newsrss',
-    'https://www.animenewsnetwork.com/news/feed.xml'
-  ];
-  
-  let items = [];
-  for (const url of feeds) {
-    try {
-      const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=2`);
-      const data = await res.json();
-      if (data.status === 'ok') items.push(...data.items);
-    } catch (e) {}
-  }
-  
-  items.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-  
-  document.getElementById('rss-news').innerHTML = 
-    items.slice(0, 4).map(item => `
-      <div class="bg-black/40 p-4 rounded border border-gray-900">
-        <h3 class="font-bold text-white">${item.title}</h3>
-        <p class="text-gray-300 text-sm mt-1">${item.description.replace(/<.*?>/g, '').substring(0, 150)}...</p>
-        <a href="${item.link}" target="_blank" class="text-primary text-sm mt-2 inline-block">Read more →</a>
+  <!-- Favicon: Red "N" on black -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000000'/><text y='0.9em' font-size='90' fill='%23ff0033'>N</text></svg>">
+</head>
+<body class="bg-dark text-offwhite min-h-screen font-sans">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- Header -->
+    <header class="text-center mb-12">
+      <h1 class="text-5xl font-bold tracking-tight">
+        <span class="text-primary">N</span>Anime
+      </h1>
+      <p class="text-lightgray mt-3 text-lg">News • Schedule • Recommendations</p>
+    </header>
+
+    <!-- Today's Lineup -->
+    <section class="mb-12">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-primary text-xl">📺</span>
+        <h2 class="text-2xl font-bold">Today's Anime Lineup</h2>
       </div>
-    `).join('');
-}
+      <div id="schedule" class="space-y-4">
+        <p class="text-gray-500">Loading schedule...</p>
+      </div>
+      <p class="text-sm text-gray-600 mt-3">
+        All episodes stream legally on official platforms.
+      </p>
+    </section>
 
-// Load when page is ready
-document.addEventListener('DOMContentLoaded', loadRssNews);
-</script>
+    <!-- Latest News from RSS -->
+    <section class="mb-12">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-primary text-xl">📰</span>
+        <h2 class="text-2xl font-bold">Latest Anime News</h2>
+      </div>
+      <div id="rss-news" class="space-y-5">
+        <p class="text-gray-500">Loading latest updates...</p>
+      </div>
+      <p class="text-sm text-gray-600 mt-3">
+        Sources: 
+        <a href="https://www.crunchyroll.com" class="text-primary hover:underline" target="_blank">Crunchyroll</a> & 
+        <a href="https://www.animenewsnetwork.com" class="text-primary hover:underline" target="_blank">ANN</a>
+      </p>
+    </section>
+
+    <!-- What to Watch Quiz -->
+    <section class="mb-12">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-primary text-xl">🤔</span>
+        <h2 class="text-2xl font-bold">What Should You Watch?</h2>
+      </div>
+      <div class="bg-black/40 p-6 rounded-xl border border-gray-900">
+        <p class="mb-4">Pick your mood and genre — get a legal anime recommendation!</p>
+        
+        <select id="mood" class="bg-gray-900 text-white border border-gray-700 rounded px-3 py-2 mr-3 mb-3">
+          <option value="excited">I want action!</option>
+          <option value="chill">I want something relaxing</option>
+          <option value="deep">I want deep story</option>
+        </select>
+        
+        <select id="genre" class="bg-gray-900 text-white border border-gray-700 rounded px-3 py-2 mb-3">
+          <option value="shonen">Shonen</option>
+          <option value="slice">Slice of Life</option>
+          <option value="mecha">Mecha</option>
+          <option value="romance">Romance</option>
+        </select>
+        
+        <button onclick="getRecommendation()" class="bg-primary text-white px-4 py-2 rounded hover:bg-red-700 transition">
+          Get Recommendation
+        </button>
+        
+        <div id="recommendation-result" class="mt-4 text-gray-300"></div>
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="text-center py-8 bg-black/30 rounded-xl border border-gray-900">
+      <h3 class="text-xl font-semibold mb-3">Support Official Anime!</h3>
+      <p class="text-gray-300 mb-4">We only link to legal streaming services like Crunchyroll, HIDIVE, and Netflix.</p>
+      <a href="https://www.crunchyroll.com" target="_blank"
+         class="inline-block bg-primary text-white font-bold px-6 py-2 rounded-full hover:bg-red-700 transition shadow-md">
+        Watch Legally on Crunchyroll
+      </a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-gray-600 text-sm pt-10 mt-8 border-t border-gray-900">
+      <p>© 2026 NAnime • 100% Legal Fan Hub</p>
+      <p class="mt-1">Not affiliated with any anime studio or distributor.</p>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // Load anime schedule from AniList
+    async function loadSchedule() {
+      const now = Math.floor(Date.now() / 1000);
+      const query = `
+        query {
+          Page(page: 1, perPage: 6) {
+            airingSchedules(airingAt_greater: ${now}, sort: TIME) {
+              timeUntilAiring
+              episode
+              media { title { romaji } }
+            }
+          }
+        }
+      `;
+      try {
+        const res = await fetch('https://graphql.anilist.co', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+        const data = await res.json();
+        const schedules = data.data.Page.airingSchedules;
+        const container = document.getElementById('schedule');
+        
+        if (!schedules || schedules.length === 0) {
+          container.innerHTML = '<p class="text-yellow-400 text-center py-4">No new episodes scheduled in the next 24 hours.</p>';
+          return;
+        }
+
+        container.innerHTML = schedules.map(s => {
+          const hours = Math.floor(s.timeUntilAiring / 3600);
+          const mins = Math.floor((s.timeUntilAiring % 3600) / 60);
+          return `
+            <div class="bg-black/40 p-4 rounded-lg border border-gray-900 hover:border-primary transition">
+              <div class="font-bold text-lg">${s.media.title.romaji}</div>
+              <div class="text-gray-300 mt-1">Episode ${s.episode} • Airing in ~${hours}h ${mins}m</div>
+              <a href="https://www.crunchyroll.com" target="_blank" 
+                 class="text-primary hover:text-red-400 text-sm mt-2 inline-block font-medium">
+                Watch Officially →
+              </a>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        document.getElementById('schedule').innerHTML = '<p class="text-red-400 text-center">Failed to load schedule.</p>';
+      }
+    }
+
+    // Load news from RSS feeds
+    async function loadRssNews() {
+      const feeds = [
+        'https://www.crunchyroll.com/newsrss',
+        'https://www.animenewsnetwork.com/news/feed.xml'
+      ];
+      
+      let allItems = [];
+      for (const url of feeds) {
+        try {
+          const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=3`;
+          const response = await fetch(proxyUrl);
+          const data = await response.json();
+          if (data.status === 'ok') {
+            const isCrunchyroll = url.includes('crunchyroll');
+            allItems.push(...data.items.map(item => ({
+              ...item,
+              source: isCrunchyroll ? 'Crunchyroll' : 'ANN'
+            })));
+          }
+        } catch (err) {
+          console.warn('Feed failed:', url);
+        }
+      }
+
+      allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+      const topNews = allItems.slice(0, 4);
+
+      const container = document.getElementById('rss-news');
+      if (topNews.length === 0) {
+        container.innerHTML = '<p class="text-yellow-400">News feed temporarily unavailable.</p>';
+        return;
+      }
+
+      container.innerHTML = topNews.map(item => `
+        <div class="bg-black/40 p-5 rounded-xl border border-gray-900">
+          <div class="text-xs text-primary font-bold mb-1">${item.source}</div>
+          <h3 class="font-bold text-lg text-white leading-tight">${item.title}</h3>
+          <p class="text-gray-300 mt-2 text-sm">
+            ${item.description.replace(/<[^>]*>/g, '').substring(0, 180)}...
+          </p>
+          <a href="${item.link}" target="_blank" rel="noopener noreferrer"
+             class="inline-block mt-3 text-primary hover:text-red-400 text-sm font-medium">
+            Read full story →
+          </a>
+        </div>
+      `).join('');
+    }
+
+    // Recommendation Quiz
+    function getRecommendation() {
+      const mood = document.getElementById('mood').value;
+      const genre = document.getElementById('genre').value;
+      let anime, reason, platform;
+
+      if (mood === 'excited' && genre === 'shonen') {
+        anime = "Demon Slayer";
+        reason = "Epic battles, stunning animation, and emotional depth.";
+        platform = "Crunchyroll";
+      } else if (mood === 'chill' && genre === 'slice') {
+        anime = "Laid-Back Camp";
+        reason = "Peaceful vibes, beautiful scenery, and cozy friendships.";
+        platform = "HIDIVE";
+      } else if (mood === 'deep' && genre === 'mecha') {
+        anime = "Neon Genesis Evangelion";
+        reason = "Psychological mecha classic that redefined anime.";
+        platform = "Netflix";
+      } else {
+        anime = "Jujutsu Kaisen";
+        reason = "Modern shonen hit with incredible animation and pacing.";
+        platform = "Crunchyroll";
+      }
+
+      document.getElementById('recommendation-result').innerHTML = `
+        <div class="p-3 bg-gray-900/50 rounded">
+          <strong class="text-primary">${anime}</strong><br>
+          ${reason}<br>
+          <a href="https://www.${platform.toLowerCase()}.com" target="_blank" class="text-primary hover:underline">
+            Watch on ${platform} →
+          </a>
+        </div>
+      `;
+    }
+
+    // Initialize everything
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSchedule();
+      loadRssNews();
+    });
+  </script>
+</body>
+</html>
