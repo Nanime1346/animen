@@ -170,7 +170,7 @@
               <h2 class="text-2xl font-bold">Latest Anime News</h2>
             </div>
             <div id="rss-news" class="space-y-5">
-              <p class="text-gray-500">Loading latest updates...</p>
+              <p class="text-gray-500">News from Crunchyroll</p>
             </div>
           </section>
         </div>
@@ -324,26 +324,16 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query })
         });
-        if (!res.ok) throw new Error('Network response was not ok');
         const data = await res.json();
         allGenres = (data.data.GenreCollection || [])
           .filter(g => g && g.toLowerCase() !== 'hentai')
           .sort();
         renderGenreFilters();
-      } catch (e) {
-        document.getElementById('genre-filters').innerHTML = `
-          <span class="text-red-400">Failed to load genres.</span>
-          <button onclick="loadGenres()" class="ml-2 text-primary text-sm">Retry</button>
-        `;
-      }
+      } catch (e) {}
     }
 
     function renderGenreFilters() {
       const container = document.getElementById('genre-filters');
-      if (allGenres.length === 0) {
-        container.innerHTML = '<span class="text-gray-500">No genres available.</span>';
-        return;
-      }
       container.innerHTML = allGenres.map(genre => `
         <span class="genre-tag" data-genre="${genre}">${genre}</span>
       `).join('');
@@ -423,19 +413,6 @@
 
     document.getElementById('back-button').addEventListener('click', showMainView);
 
-    // --- FETCH WITH RETRY ---
-    async function fetchWithRetry(url, options, retries = 3) {
-      for (let i = 0; i < retries; i++) {
-        try {
-          const response = await fetch(url, options);
-          if (response.ok) return response;
-        } catch (e) {
-          if (i === retries - 1) throw e;
-          await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
-        }
-      }
-    }
-
     // --- LOAD MEDIA ---
     async function loadAnime(append = false) {
       const variables = { page: animePage, type: 'ANIME' };
@@ -466,7 +443,7 @@
       `;
 
       try {
-        const res = await fetchWithRetry('https://graphql.anilist.co', {
+        const res = await fetch('https://graphql.anilist.co', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query, variables })
@@ -475,11 +452,9 @@
         renderAnime(data.data.Page.media || [], append);
         if (!append) animePage = 2;
       } catch (e) {
-        const errorMsg = !append ? `
-          <p class="text-red-400">Failed to load anime.</p>
-          <button onclick="loadAnime()" class="mt-2 text-primary">Retry</button>
-        ` : '';
-        if (!append) document.getElementById('anime-list').innerHTML = errorMsg;
+        if (!append) {
+          document.getElementById('anime-list').innerHTML = '<p class="text-red-400">Failed to load anime.</p>';
+        }
       }
     }
 
@@ -512,7 +487,7 @@
       `;
 
       try {
-        const res = await fetchWithRetry('https://graphql.anilist.co', {
+        const res = await fetch('https://graphql.anilist.co', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query, variables })
@@ -521,11 +496,9 @@
         renderManga(data.data.Page.media || [], append);
         if (!append) mangaPage = 2;
       } catch (e) {
-        const errorMsg = !append ? `
-          <p class="text-red-400">Failed to load manga.</p>
-          <button onclick="loadManga()" class="mt-2 text-primary">Retry</button>
-        ` : '';
-        if (!append) document.getElementById('manga-list').innerHTML = errorMsg;
+        if (!append) {
+          document.getElementById('manga-list').innerHTML = '<p class="text-red-400">Failed to load manga.</p>';
+        }
       }
     }
 
@@ -558,7 +531,7 @@
       `;
 
       try {
-        const res = await fetchWithRetry('https://graphql.anilist.co', {
+        const res = await fetch('https://graphql.anilist.co', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query, variables })
@@ -567,11 +540,9 @@
         renderMovies(data.data.Page.media || [], append);
         if (!append) moviesPage = 2;
       } catch (e) {
-        const errorMsg = !append ? `
-          <p class="text-red-400">Failed to load movies.</p>
-          <button onclick="loadMoviesMain()" class="mt-2 text-primary">Retry</button>
-        ` : '';
-        if (!append) document.getElementById('movies-list-main').innerHTML = errorMsg;
+        if (!append) {
+          document.getElementById('movies-list-main').innerHTML = '<p class="text-red-400">Failed to load movies.</p>';
+        }
       }
     }
 
@@ -676,7 +647,7 @@
         }
       `;
       try {
-        const res = await fetchWithRetry('https://graphql.anilist.co', {
+        const res = await fetch('https://graphql.anilist.co', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query })
@@ -693,44 +664,15 @@
       } catch (e) {}
     }
 
-    // --- NEWS (FIXED WITH RELIABLE PROXY) ---
-    async function loadRssNews() {
-      const feedUrl = 'https://www.crunchyroll.com/newsrss';
-      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(feedUrl)}`;
-      
-      try {
-        const response = await fetch(proxyUrl);
-        const text = await response.text();
-        
-        // Parse XML manually (fallback)
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(text, "text/xml");
-        const items = xmlDoc.querySelectorAll('item');
-        
-        if (items.length === 0) throw new Error('No items');
-        
-        const newsHtml = Array.from(items).slice(0, 3).map(item => {
-          const title = item.querySelector('title')?.textContent || 'Untitled';
-          const link = item.querySelector('link')?.textContent || '#';
-          const pubDate = item.querySelector('pubDate')?.textContent || '';
-          const dateStr = pubDate ? new Date(pubDate).toLocaleDateString() : '';
-          return `
-            <div class="bg-black/40 p-4 rounded-xl">
-              <a href="${link}" target="_blank" class="font-bold hover:text-primary">${title}</a>
-              ${dateStr ? `<p class="text-gray-400 text-sm mt-1">${dateStr}</p>` : ''}
-            </div>
-          `;
-        }).join('');
-        
-        document.getElementById('rss-news').innerHTML = newsHtml;
-      } catch (e) {
-        document.getElementById('rss-news').innerHTML = `
-          <div class="bg-black/40 p-4 rounded-xl">
-            <p class="text-yellow-400">News temporarily unavailable.</p>
-            <button onclick="loadRssNews()" class="mt-2 text-primary text-sm">Retry</button>
-          </div>
-        `;
-      }
+    // --- NEWS (SIMPLIFIED) ---
+    function loadRssNews() {
+      document.getElementById('rss-news').innerHTML = `
+        <div class="bg-black/40 p-4 rounded-xl">
+          <a href="https://www.crunchyroll.com" target="_blank" class="font-bold hover:text-primary">
+            View Latest News on Crunchyroll →
+          </a>
+        </div>
+      `;
     }
 
     // --- DETAIL PAGE ---
@@ -766,7 +708,7 @@
       `;
 
       try {
-        const res = await fetchWithRetry('https://graphql.anilist.co', {
+        const res = await fetch('https://graphql.anilist.co', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query, variables: { id: parseInt(id), type } })
@@ -848,10 +790,7 @@
 
         showDetailView();
       } catch (error) {
-        document.getElementById('detail-content').innerHTML = `
-          <p class="text-red-400">Failed to load details.</p>
-          <button onclick="showMediaDetail('${type}', ${id})" class="mt-2 text-primary">Retry</button>
-        `;
+        document.getElementById('detail-content').innerHTML = '<p class="text-red-400">Failed to load details.</p>';
         showDetailView();
       }
     }
@@ -884,7 +823,7 @@
         }
       `;
       try {
-        const res = await fetchWithRetry('https://graphql.anilist.co', {
+        const res = await fetch('https://graphql.anilist.co', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query, variables: { search: term, type } })
@@ -923,7 +862,7 @@
       loadGenres();
       loadAnime();        // ✅ Loads anime on home page
       loadTrending();
-      loadRssNews();      // ✅ Loads news with fallback
+      loadRssNews();      // ✅ Simplified news link
     });
   </script>
 </body>
