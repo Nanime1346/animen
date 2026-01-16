@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NAnime - Anime, Manga & Movies</title>
-  <meta name="description" content="Discover anime, manga, and movies. Comment, share, and save your favorites.">
+  <meta name="description" content="Discover anime, manga, and movies. Save your favorites and share with friends.">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -177,52 +177,29 @@
       </div>
       
       <!-- SHARE BUTTON -->
-      <div class="mt-6 flex gap-3">
+      <div class="mt-6">
         <button id="share-button" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded flex items-center gap-2">
           <span>🔗</span> Share
         </button>
       </div>
-
-      <!-- COMMENTS -->
-      <div class="mt-8">
-        <h3 class="text-xl font-bold mb-4">Comments</h3>
-        <div id="disqus_thread"></div>
-      </div>
     </div>
   </div>
 
-  <!-- Disqus Script (will load only on detail page) -->
+  <!-- Web Share API -->
   <script>
-    function loadDisqus(mediaId, title) {
-      // Remove existing Disqus
-      document.getElementById('disqus_thread').innerHTML = '';
-      
-      // Set variables
-      window.disqus_config = function () {
-        this.page.identifier = 'nanimе-' + mediaId;
-        this.page.title = title;
-        this.page.url = window.location.href;
-      };
-
-      // Load Disqus
-      const d = document, s = d.createElement('script');
-      s.src = 'https://nanimе.disqus.com/embed.js';
-      s.setAttribute('data-timestamp', +new Date());
-      (d.head || d.body).appendChild(s);
-    }
-
-    // Web Share API
-    document.getElementById('share-button')?.addEventListener('click', async () => {
-      try {
-        await navigator.share({
-          title: document.querySelector('#detail-content h1')?.innerText || 'Check this out!',
-          url: window.location.href
-        });
-      } catch (err) {
-        // Fallback: copy URL
-        navigator.clipboard.writeText(window.location.href).then(() => {
-          alert('Link copied to clipboard!');
-        });
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'share-button') {
+        const title = document.querySelector('#detail-content h1')?.innerText || 'Check this out!';
+        const url = window.location.href;
+        
+        if (navigator.share) {
+          navigator.share({ title, url }).catch(console.error);
+        } else {
+          // Fallback: copy URL
+          navigator.clipboard.writeText(url).then(() => {
+            alert('Link copied to clipboard!');
+          });
+        }
       }
     });
   </script>
@@ -351,12 +328,9 @@
       // Add click listeners
       document.querySelectorAll('.genre-tag').forEach(tag => {
         tag.addEventListener('click', () => {
-          // Toggle active class
           document.querySelectorAll('.genre-tag').forEach(t => t.classList.remove('active'));
           tag.classList.add('active');
-          
-          // In a full app, this would re-fetch with genre filter
-          alert(`Filtering by genre: ${tag.dataset.genre}\n(This would reload the list in a full version.)`);
+          alert(`Filtering by: ${tag.dataset.genre}\n(Full filtering requires backend.)`);
         });
       });
     }
@@ -538,7 +512,7 @@
       } catch (e) {}
     }
 
-    // --- SHOW DETAIL PAGE (with comments) ---
+    // --- SHOW DETAIL PAGE (NO COMMENTS) ---
     async function showMediaDetail(type, id) {
       const query = `
         query ($id: Int, $type: MediaType) {
@@ -660,9 +634,6 @@
         // Update bookmark icon
         const isBookmarked = bookmarks.some(b => b.id == media.id);
         document.getElementById('detail-bookmark-icon').textContent = isBookmarked ? '★' : '☆';
-
-        // Load comments
-        loadDisqus(media.id, title);
 
         showDetailView();
       } catch (error) {
