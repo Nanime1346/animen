@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NAnime - Anime, Manga & Movies</title>
-  <meta name="description" content="Filter anime, manga, and movies by multiple genres. No Hentai.">
+  <meta name="description" content="Discover and filter anime, manga, and movies by genre. No Hentai.">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -42,18 +42,6 @@
       .main-content { max-width: 65%; }
       .sidebar { width: 33%; }
     }
-    .genre-tag {
-      display: inline-block;
-      background: #222;
-      padding: 0.25rem 0.75rem;
-      margin: 0.25rem;
-      border-radius: 999px;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .genre-tag:hover { background: #333; }
-    .genre-tag.selected { background: #ff0033; color: white; }
   </style>
 </head>
 <body class="bg-dark text-offwhite min-h-screen font-sans">
@@ -92,27 +80,30 @@
         </div>
       </section>
 
-      <!-- 🎭 MULTI-GENRE FILTER -->
-      <section class="mb-6">
-        <h3 class="text-lg font-bold mb-3">Filter by Genre (Select Multiple)</h3>
-        <div id="genre-filters" class="flex flex-wrap gap-2">
-          <span class="text-gray-500">Loading genres...</span>
+      <!-- 🎭 FULL FILTER PANEL -->
+      <section class="mb-6 p-4 bg-gray-900/50 rounded-xl">
+        <h3 class="text-lg font-bold mb-3">Filter Media</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <!-- Type -->
+          <select id="filter-type" class="bg-gray-800 text-white rounded px-3 py-2">
+            <option value="all">All Types</option>
+            <option value="ANIME">Anime</option>
+            <option value="MANGA">Manga</option>
+            <option value="MOVIE">Movies</option>
+          </select>
+          
+          <!-- Genre -->
+          <select id="filter-genre" class="bg-gray-800 text-white rounded px-3 py-2">
+            <option value="">All Genres</option>
+            <!-- Genres will load here -->
+          </select>
+          
+          <!-- Sort -->
+          <select id="sort-by" class="bg-gray-800 text-white rounded px-3 py-2">
+            <option value="date">Recently Added</option>
+            <option value="title">Title (A-Z)</option>
+          </select>
         </div>
-      </section>
-
-      <!-- Type + Sort Filters -->
-      <section class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3">
-        <select id="filter-type" class="bg-gray-800 text-white rounded px-3 py-2">
-          <option value="all">All Types</option>
-          <option value="ANIME">Anime</option>
-          <option value="MANGA">Manga</option>
-          <option value="MOVIE">Movies</option>
-        </select>
-        
-        <select id="sort-by" class="bg-gray-800 text-white rounded px-3 py-2">
-          <option value="date">Recently Added</option>
-          <option value="title">Title (A-Z)</option>
-        </select>
       </section>
 
       <!-- Tabs -->
@@ -229,7 +220,7 @@
     // --- STATE ---
     let currentView = 'anime';
     let animePage = 1, mangaPage = 1, moviesPage = 1;
-    let selectedGenres = []; // e.g., ["Action", "Romance"]
+    let currentGenre = '';
     let allGenres = [];
 
     // --- BOOKMARKING ---
@@ -313,35 +304,24 @@
         allGenres = (data.data.GenreCollection || [])
           .filter(g => g && g.toLowerCase() !== 'hentai')
           .sort();
-        renderGenreFilters();
+        renderGenreFilter();
       } catch (e) {}
     }
 
-    function renderGenreFilters() {
-      const container = document.getElementById('genre-filters');
-      container.innerHTML = allGenres.map(genre => `
-        <span class="genre-tag" data-genre="${genre}">${genre}</span>
-      `).join('');
-      
-      // Add click listeners
-      document.querySelectorAll('.genre-tag').forEach(tag => {
-        tag.addEventListener('click', () => {
-          const genre = tag.dataset.genre;
-          const index = selectedGenres.indexOf(genre);
-          if (index > -1) {
-            selectedGenres.splice(index, 1);
-            tag.classList.remove('selected');
-          } else {
-            selectedGenres.push(genre);
-            tag.classList.add('selected');
-          }
-          applyFilters(); // reload with new selection
-        });
+    function renderGenreFilter() {
+      const select = document.getElementById('filter-genre');
+      select.innerHTML = '<option value="">All Genres</option>';
+      allGenres.forEach(genre => {
+        const option = document.createElement('option');
+        option.value = genre;
+        option.textContent = genre;
+        select.appendChild(option);
       });
     }
 
     // --- APPLY FILTERS TO MEDIA LIST ---
     function applyFilters() {
+      currentGenre = document.getElementById('filter-genre').value;
       if (currentView === 'anime') {
         animePage = 1;
         loadAnime();
@@ -354,9 +334,14 @@
       }
     }
 
-    // Attach listeners for type/sort
-    document.getElementById('filter-type').addEventListener('change', renderMyListPreview);
-    document.getElementById('sort-by').addEventListener('change', renderMyListPreview);
+    // Attach listeners
+    document.getElementById('filter-type').addEventListener('change', () => {
+      renderMyListPreview();
+    });
+    document.getElementById('filter-genre').addEventListener('change', applyFilters);
+    document.getElementById('sort-by').addEventListener('change', () => {
+      renderMyListPreview();
+    });
 
     // --- TABS ---
     function setTab(tab) {
@@ -377,7 +362,7 @@
         }
       });
       
-      applyFilters();
+      applyFilters(); // reload with current filters
     }
 
     document.getElementById('tab-anime').addEventListener('click', () => setTab('anime'));
@@ -397,20 +382,19 @@
 
     document.getElementById('back-button').addEventListener('click', showMainView);
 
-    // --- LOAD MEDIA BY MULTIPLE GENRES ---
+    // --- LOAD MEDIA BY GENRE ---
     async function loadAnime(append = false) {
       const variables = { page: animePage, type: 'ANIME' };
-      if (selectedGenres.length > 0) variables.genres = selectedGenres;
+      if (currentGenre) variables.genre = currentGenre;
       if (currentView === 'movies') variables.format = 'MOVIE';
 
-      // AniList supports multiple genres via `genres` array
       const query = `
-        query ($page: Int, $genres: [String], $type: MediaType, $format: MediaFormat) {
+        query ($page: Int, $genre: String, $type: MediaType, $format: MediaFormat) {
           Page(page: $page, perPage: 20) {
             media(
               type: $type,
               ${currentView === 'movies' ? 'format: $format,' : ''}
-              genres_in: $genres,
+              genre: $genre,
               sort: POPULARITY_DESC
             ) {
               id
@@ -437,12 +421,12 @@
 
     async function loadManga(append = false) {
       const variables = { page: mangaPage, type: 'MANGA' };
-      if (selectedGenres.length > 0) variables.genres = selectedGenres;
+      if (currentGenre) variables.genre = currentGenre;
 
       const query = `
-        query ($page: Int, $genres: [String]) {
+        query ($page: Int, $genre: String) {
           Page(page: $page, perPage: 20) {
-            media(type: MANGA, genres_in: $genres, sort: POPULARITY_DESC) {
+            media(type: MANGA, genre: $genre, sort: POPULARITY_DESC) {
               id
               title { romaji }
               coverImage { large }
@@ -467,12 +451,12 @@
 
     async function loadMoviesMain(append = false) {
       const variables = { page: moviesPage, type: 'ANIME', format: 'MOVIE' };
-      if (selectedGenres.length > 0) variables.genres = selectedGenres;
+      if (currentGenre) variables.genre = currentGenre;
 
       const query = `
-        query ($page: Int, $genres: [String]) {
+        query ($page: Int, $genre: String) {
           Page(page: $page, perPage: 20) {
-            media(type: ANIME, format: MOVIE, genres_in: $genres, sort: POPULARITY_DESC) {
+            media(type: ANIME, format: MOVIE, genre: $genre, sort: POPULARITY_DESC) {
               id
               title { romaji }
               coverImage { large }
@@ -597,7 +581,7 @@
       } catch (e) {}
     }
 
-    // --- DETAIL PAGE ---
+    // --- DETAIL PAGE (same as before) ---
     async function showMediaDetail(type, id) {
       const query = `
         query ($id: Int, $type: MediaType) {
@@ -732,6 +716,7 @@
         applyFilters(); // reset to filtered view
         return;
       }
+      // Search ignores current genre filter
       let type = 'ANIME';
       if (currentView === 'manga') type = 'MANGA';
       const query = `
@@ -798,7 +783,7 @@
     // --- INIT ---
     document.addEventListener('DOMContentLoaded', () => {
       renderMyListPreview();
-      loadGenres(); // ✅ Loads clickable genre tags
+      loadGenres(); // ✅ Loads genres into filter
       loadAnime();
       loadTrending();
       loadRssNews();
