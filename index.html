@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>NAnime - Anime, Manga & Movies</title>
-  <meta name="description" content="Discover and filter anime, manga, and movies by genre. No Hentai.">
+  <title>animeN - Anime, Manga & Movies</title>
+  <meta name="description" content="Discover and filter anime, manga, and movies by genre. No Hentai. — animeN">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -33,7 +34,7 @@
   </script>
 
   <!-- Favicon -->
-  <link rel="icon" href="image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000000'/><text y='0.9em' font-size='90' fill='%23ff0033'>N</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000000'/><text y='0.9em' font-size='90' fill='%23ff0033'>N</text></svg>">
   <style>
     .bookmark-btn { background: none; border: none; color: #555; cursor: pointer; font-size: 1.4rem; position: absolute; top: 0.5rem; right: 0.5rem; }
     .bookmark-btn.active { color: gold; }
@@ -44,16 +45,16 @@
     }
   </style>
 </head>
-<body class="bg-dark text-offwhite min-h-screen font-sans">
+<body class="min-h-screen font-sans bg-white text-gray-900 dark:bg-dark dark:text-offwhite">
   <div id="app" class="container mx-auto px-4 py-8 max-w-7xl">
     <!-- Main App Content -->
     <div id="main-view">
       <!-- Header -->
-      <header class="text-center mb-8">
+      <header class="text-center mb-8 flex justify-center items-center gap-4">
         <h1 class="text-5xl font-bold tracking-tight">
-          <span class="text-primary">N</span>Anime
+          anime<span class="text-primary">N</span>
         </h1>
-        <p class="text-lightgray mt-3 text-lg">Anime • Manga • Movies</p>
+        <button id="theme-toggle" class="text-xl">🌓</button>
       </header>
 
       <!-- 🔍 Search Bar -->
@@ -63,7 +64,7 @@
             type="text" 
             id="search-input" 
             placeholder="Search anime, manga, or movies..." 
-            class="w-full bg-gray-900 border border-gray-700 text-white rounded-full py-3 px-5 pl-12 focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full bg-gray-900 dark:bg-gray-800 border border-gray-700 text-white rounded-full py-3 px-5 pl-12 focus:outline-none focus:ring-2 focus:ring-primary"
           >
           <span class="absolute left-4 top-3.5 text-gray-400">🔍</span>
         </div>
@@ -76,30 +77,26 @@
           <h2 class="text-lg font-bold">My List</h2>
         </div>
         <div id="mylist-preview" class="flex flex-wrap gap-2 text-sm">
-          <span class="text-gray-500">Click ★ to save.</span>
+          <span class="text-gray-500 dark:text-gray-400">Click ★ to save.</span>
         </div>
       </section>
 
       <!-- 🎭 FULL FILTER PANEL -->
-      <section class="mb-6 p-4 bg-gray-900/50 rounded-xl">
+      <section class="mb-6 p-4 bg-gray-900/50 dark:bg-gray-800/50 rounded-xl">
         <h3 class="text-lg font-bold mb-3">Filter Media</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <!-- Type -->
-          <select id="filter-type" class="bg-gray-800 text-white rounded px-3 py-2">
+          <select id="filter-type" class="bg-gray-800 dark:bg-gray-700 text-white rounded px-3 py-2">
             <option value="all">All Types</option>
             <option value="ANIME">Anime</option>
             <option value="MANGA">Manga</option>
             <option value="MOVIE">Movies</option>
           </select>
           
-          <!-- Genre -->
-          <select id="filter-genre" class="bg-gray-800 text-white rounded px-3 py-2">
+          <select id="filter-genre" class="bg-gray-800 dark:bg-gray-700 text-white rounded px-3 py-2">
             <option value="">All Genres</option>
-            <!-- Genres will load here -->
           </select>
           
-          <!-- Sort -->
-          <select id="sort-by" class="bg-gray-800 text-white rounded px-3 py-2">
+          <select id="sort-by" class="bg-gray-800 dark:bg-gray-700 text-white rounded px-3 py-2">
             <option value="date">Recently Added</option>
             <option value="title">Title (A-Z)</option>
           </select>
@@ -109,8 +106,8 @@
       <!-- Tabs -->
       <div class="flex flex-wrap justify-center gap-2 mb-4">
         <button id="tab-anime" class="px-5 py-2.5 font-medium text-white bg-primary rounded-lg">📺 Anime</button>
-        <button id="tab-manga" class="px-5 py-2.5 font-medium text-gray-300 bg-gray-800 rounded-lg hover:bg-gray-700">📖 Manga</button>
-        <button id="tab-movies" class="px-5 py-2.5 font-medium text-gray-300 bg-gray-800 rounded-lg hover:bg-gray-700">🎬 Movies</button>
+        <button id="tab-manga" class="px-5 py-2.5 font-medium text-gray-300 bg-gray-800 dark:bg-gray-700 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600">📖 Manga</button>
+        <button id="tab-movies" class="px-5 py-2.5 font-medium text-gray-300 bg-gray-800 dark:bg-gray-700 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600">🎬 Movies</button>
       </div>
 
       <!-- Main Content -->
@@ -123,7 +120,7 @@
               <h2 class="text-2xl font-bold">All Anime</h2>
             </div>
             <div id="anime-list" class="space-y-6">
-              <p class="text-gray-500">Loading anime...</p>
+              <p class="text-gray-500 dark:text-gray-400">Loading anime...</p>
             </div>
             <button id="load-more-anime" class="mt-4 text-primary hover:underline">Load More Anime</button>
           </section>
@@ -135,7 +132,7 @@
               <h2 class="text-2xl font-bold">All Manga</h2>
             </div>
             <div id="manga-list" class="space-y-6">
-              <p class="text-gray-500">Loading manga...</p>
+              <p class="text-gray-500 dark:text-gray-400">Loading manga...</p>
             </div>
             <button id="load-more-manga" class="mt-4 text-primary hover:underline">Load More Manga</button>
           </section>
@@ -147,7 +144,7 @@
               <h2 class="text-2xl font-bold">All Movies</h2>
             </div>
             <div id="movies-list-main" class="space-y-6">
-              <p class="text-gray-500">Loading movies...</p>
+              <p class="text-gray-500 dark:text-gray-400">Loading movies...</p>
             </div>
             <button id="load-more-movies" class="mt-4 text-primary hover:underline">Load More Movies</button>
           </section>
@@ -159,7 +156,7 @@
               <h2 class="text-2xl font-bold">Latest Anime News</h2>
             </div>
             <div id="rss-news" class="space-y-5">
-              <p class="text-gray-500">Loading latest updates...</p>
+              <p class="text-gray-500 dark:text-gray-400">Loading latest updates...</p>
             </div>
           </section>
         </div>
@@ -171,14 +168,14 @@
               <span class="text-yellow-400">🔥</span> Trending Now
             </h3>
             <div id="trending-list" class="space-y-3">
-              <p class="text-gray-500 text-sm">Loading trending...</p>
+              <p class="text-gray-500 dark:text-gray-400 text-sm">Loading trending...</p>
             </div>
           </section>
         </div>
       </div>
 
-      <footer class="text-center text-gray-600 text-sm pt-10 mt-8 border-t border-gray-900">
-        <p>© 2026 NAnime • 100% Legal Fan Hub • No Hentai</p>
+      <footer class="text-center text-gray-600 dark:text-gray-400 text-sm pt-10 mt-8 border-t border-gray-900 dark:border-gray-700">
+        <p>© 2026 animeN • 100% Legal Fan Hub • No Hentai</p>
       </footer>
     </div>
 
@@ -187,11 +184,11 @@
       <button id="back-button" class="mb-6 flex items-center text-primary hover:underline">
         ← Back to List
       </button>
-      <div id="detail-content" class="bg-black/40 p-6 rounded-xl border border-gray-800">
-        <p class="text-gray-500">Loading details...</p>
+      <div id="detail-content" class="bg-black/40 dark:bg-gray-800/50 p-6 rounded-xl border border-gray-800 dark:border-gray-700">
+        <p class="text-gray-500 dark:text-gray-400">Loading details...</p>
       </div>
       <div class="mt-6">
-        <button id="share-button" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded flex items-center gap-2">
+        <button id="share-button" class="bg-gray-800 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-600 px-4 py-2 rounded flex items-center gap-2">
           <span>🔗</span> Share
         </button>
       </div>
@@ -217,6 +214,22 @@
 
   <!-- Main Scripts -->
   <script>
+    // --- DARK/LIGHT MODE ---
+    function initTheme() {
+      const saved = localStorage.getItem('animeN-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = saved || (prefersDark ? 'dark' : 'light');
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+      localStorage.setItem('animeN-theme', theme);
+    }
+
+    function toggleTheme() {
+      const current = localStorage.getItem('animeN-theme') || 'light';
+      const newTheme = current === 'light' ? 'dark' : 'light';
+      localStorage.setItem('animeN-theme', newTheme);
+      document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    }
+
     // --- STATE ---
     let currentView = 'anime';
     let animePage = 1, mangaPage = 1, moviesPage = 1;
@@ -225,7 +238,7 @@
 
     // --- BOOKMARKING ---
     function getBookmarks() {
-      return JSON.parse(localStorage.getItem('nanimе-bookmarks') || '[]');
+      return JSON.parse(localStorage.getItem('animeN-bookmarks') || '[]');
     }
 
     function toggleBookmark(media) {
@@ -237,7 +250,7 @@
       } else {
         bookmarks.push({ ...media, addedAt: Date.now() });
       }
-      localStorage.setItem('nanimе-bookmarks', JSON.stringify(bookmarks));
+      localStorage.setItem('animeN-bookmarks', JSON.stringify(bookmarks));
       renderMyListPreview();
       updateBookmarkButtons();
     }
@@ -261,12 +274,12 @@
       }
 
       if (bookmarks.length === 0) {
-        container.innerHTML = '<span class="text-gray-500">Click ★ to save.</span>';
+        container.innerHTML = '<span class="text-gray-500 dark:text-gray-400">Click ★ to save.</span>';
         return;
       }
 
       container.innerHTML = bookmarks.map(item => `
-        <span class="bg-gray-800 px-2 py-1 rounded text-xs flex items-center gap-1">
+        <span class="bg-gray-800 dark:bg-gray-700 px-2 py-1 rounded text-xs flex items-center gap-1">
           <span>${item.title || 'Untitled'}</span>
           <button onclick="removeFromList(${item.id})" class="text-red-400 hover:text-red-200">×</button>
         </span>
@@ -276,7 +289,7 @@
     function removeFromList(id) {
       let bookmarks = getBookmarks();
       bookmarks = bookmarks.filter(b => b.id !== id);
-      localStorage.setItem('nanimе-bookmarks', JSON.stringify(bookmarks));
+      localStorage.setItem('animeN-bookmarks', JSON.stringify(bookmarks));
       renderMyListPreview();
       updateBookmarkButtons();
     }
@@ -334,7 +347,6 @@
       }
     }
 
-    // Attach listeners
     document.getElementById('filter-type').addEventListener('change', () => {
       renderMyListPreview();
     });
@@ -358,11 +370,11 @@
         if (t === tab) {
           btn.className = 'px-5 py-2.5 font-medium text-white bg-primary rounded-lg';
         } else {
-          btn.className = 'px-5 py-2.5 font-medium text-gray-300 bg-gray-800 rounded-lg hover:bg-gray-700';
+          btn.className = 'px-5 py-2.5 font-medium text-gray-300 bg-gray-800 dark:bg-gray-700 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600';
         }
       });
       
-      applyFilters(); // reload with current filters
+      applyFilters();
     }
 
     document.getElementById('tab-anime').addEventListener('click', () => setTab('anime'));
@@ -382,21 +394,15 @@
 
     document.getElementById('back-button').addEventListener('click', showMainView);
 
-    // --- LOAD MEDIA BY GENRE ---
+    // --- LOAD MEDIA ---
     async function loadAnime(append = false) {
       const variables = { page: animePage, type: 'ANIME' };
       if (currentGenre) variables.genre = currentGenre;
-      if (currentView === 'movies') variables.format = 'MOVIE';
 
       const query = `
-        query ($page: Int, $genre: String, $type: MediaType, $format: MediaFormat) {
+        query ($page: Int, $genre: String, $type: MediaType) {
           Page(page: $page, perPage: 20) {
-            media(
-              type: $type,
-              ${currentView === 'movies' ? 'format: $format,' : ''}
-              genre: $genre,
-              sort: POPULARITY_DESC
-            ) {
+            media(type: $type, genre: $genre, sort: POPULARITY_DESC) {
               id
               title { romaji }
               coverImage { large }
@@ -485,12 +491,12 @@
       container.innerHTML += items.map(item => {
         const img = item.coverImage?.large || 'https://via.placeholder.com/80x112/333/666?text=?';
         return `
-          <div class="bg-black/40 p-4 rounded-xl border border-gray-900 hover:border-primary transition flex items-start gap-4 media-item cursor-pointer"
+          <div class="bg-black/40 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-900 dark:border-gray-700 hover:border-primary transition flex items-start gap-4 media-item cursor-pointer"
                onclick="showMediaDetail('ANIME', ${item.id})">
             <img src="${img}" alt="${item.title.romaji}" class="w-16 h-24 object-cover rounded-lg">
             <div>
               <div class="font-bold text-lg">${item.title.romaji}</div>
-              <div class="text-gray-300 text-sm">${item.episodes ? item.episodes + ' eps' : 'Unknown'}</div>
+              <div class="text-gray-300 dark:text-gray-400 text-sm">${item.episodes ? item.episodes + ' eps' : 'Unknown'}</div>
             </div>
             <button class="bookmark-btn" data-id="${item.id}" onclick="toggleBookmarkLight(event, ${JSON.stringify({...item, type: 'ANIME'})})">☆</button>
           </div>
@@ -505,12 +511,12 @@
       container.innerHTML += items.map(item => {
         const img = item.coverImage?.large || 'https://via.placeholder.com/80x112/333/666?text=?';
         return `
-          <div class="bg-black/40 p-4 rounded-xl border border-gray-900 hover:border-primary transition flex items-start gap-4 media-item cursor-pointer"
+          <div class="bg-black/40 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-900 dark:border-gray-700 hover:border-primary transition flex items-start gap-4 media-item cursor-pointer"
                onclick="showMediaDetail('MANGA', ${item.id})">
             <img src="${img}" alt="${item.title.romaji}" class="w-16 h-24 object-cover rounded-lg">
             <div>
               <div class="font-bold text-lg">${item.title.romaji}</div>
-              <div class="text-gray-300 text-sm">${item.chapters ? item.chapters + ' chs' : 'Unknown'}</div>
+              <div class="text-gray-300 dark:text-gray-400 text-sm">${item.chapters ? item.chapters + ' chs' : 'Unknown'}</div>
             </div>
             <button class="bookmark-btn" data-id="${item.id}" onclick="toggleBookmarkLight(event, ${JSON.stringify({...item, type: 'MANGA'})})">☆</button>
           </div>
@@ -525,12 +531,12 @@
       container.innerHTML += items.map(item => {
         const img = item.coverImage?.large || 'https://via.placeholder.com/80x112/333/666?text=?';
         return `
-          <div class="bg-black/40 p-4 rounded-xl border border-gray-900 hover:border-primary transition flex items-start gap-4 media-item cursor-pointer"
+          <div class="bg-black/40 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-900 dark:border-gray-700 hover:border-primary transition flex items-start gap-4 media-item cursor-pointer"
                onclick="showMediaDetail('ANIME', ${item.id})">
             <img src="${img}" alt="${item.title.romaji}" class="w-16 h-24 object-cover rounded-lg">
             <div>
               <div class="font-bold text-lg">${item.title.romaji}</div>
-              <div class="text-gray-300 text-sm">Movie</div>
+              <div class="text-gray-300 dark:text-gray-400 text-sm">Movie</div>
             </div>
             <button class="bookmark-btn" data-id="${item.id}" onclick="toggleBookmarkLight(event, ${JSON.stringify({...item, type: 'ANIME'})})">☆</button>
           </div>
@@ -581,7 +587,7 @@
       } catch (e) {}
     }
 
-    // --- DETAIL PAGE (same as before) ---
+    // --- DETAIL PAGE ---
     async function showMediaDetail(type, id) {
       const query = `
         query ($id: Int, $type: MediaType) {
@@ -619,9 +625,7 @@
           body: JSON.stringify({ query, variables: { id: parseInt(id), type } })
         });
 
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const result = await response.json();
-        if (result.errors) throw new Error('API error');
         const media = result.data.Media;
         if (!media) throw new Error('Media not found');
 
@@ -662,7 +666,7 @@
               <h1 class="text-3xl font-bold">${title}</h1>
               <p class="text-primary mt-1">${type === 'ANIME' ? 'Anime' : 'Manga'} • ${status}</p>
               
-              <div class="mt-4 text-gray-300">${desc}</div>
+              <div class="mt-4 text-gray-300 dark:text-gray-400">${desc}</div>
               
               <div class="mt-4 text-sm grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div><span class="text-gray-400">Genres:</span> ${cleanGenres.join(', ') || 'None'}</div>
@@ -679,7 +683,7 @@
                   title: title,
                   coverImage: media.coverImage.large,
                   type: type
-                })})" class="flex items-center gap-1 bg-gray-800 px-3 py-1 rounded">
+                })})" class="flex items-center gap-1 bg-gray-800 dark:bg-gray-700 px-3 py-1 rounded">
                   <span id="detail-bookmark-icon">☆</span> Bookmark
                 </button>
                 <a href="${media.siteUrl}" target="_blank" class="bg-primary text-white px-4 py-2 rounded hover:bg-red-700">
@@ -697,7 +701,6 @@
 
         showDetailView();
       } catch (error) {
-        console.error('Detail load error:', error);
         document.getElementById('detail-content').innerHTML = '<p class="text-red-400">Failed to load details.</p>';
         showDetailView();
       }
@@ -709,14 +712,13 @@
       document.getElementById('detail-bookmark-icon').textContent = isBookmarked ? '★' : '☆';
     }
 
-    // --- SEARCH (bypasses genre filter) ---
+    // --- SEARCH ---
     document.getElementById('search-input').addEventListener('input', async (e) => {
       const term = e.target.value.trim();
       if (term.length < 2) {
-        applyFilters(); // reset to filtered view
+        applyFilters();
         return;
       }
-      // Search ignores current genre filter
       let type = 'ANIME';
       if (currentView === 'manga') type = 'MANGA';
       const query = `
@@ -770,21 +772,32 @@
       let items = [];
       for (const url of feeds) {
         try {
-          const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=2`);
+          const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=2`;
+          const res = await fetch(proxyUrl);
           const data = await res.json();
           if (data.status === 'ok') items.push(...data.items.slice(0,2));
         } catch (e) {}
       }
       document.getElementById('rss-news').innerHTML = items.map(item => `
-        <div class="bg-black/40 p-4 rounded-xl"><h3 class="font-bold">${item.title}</h3></div>
+        <div class="bg-black/40 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-800 dark:border-gray-700">
+          <h3 class="font-bold text-gray-900 dark:text-white">${item.title}</h3>
+        </div>
       `).join('');
     }
 
     // --- INIT ---
     document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+      
       renderMyListPreview();
-      loadGenres(); // ✅ Loads genres into filter
+      loadGenres();
+      
+      // Load all three sections on startup
       loadAnime();
+      loadManga();
+      loadMoviesMain();
+      
       loadTrending();
       loadRssNews();
     });
